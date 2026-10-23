@@ -6,6 +6,9 @@ process FASTQ_TO_FASTA {
         tuple path(fastq), val(seq_source), path(reference), val(genome_id), val(raw_file_count), val(species)
     output:
         tuple path("*.fasta.gz"), val(seq_source), path(reference), val(genome_id), val(raw_file_count), val(species), emit: converted_fasta
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         fastq_to_fasta.sh ${fastq} ${fastq.simpleName}.fasta

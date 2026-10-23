@@ -5,6 +5,9 @@ process MERGE_PROVIDED_GTF {
         tuple path(input_gtfs), val(genome_id), val(individual_bin_count), val(total_bin_count)
     output:
         tuple path("${params.runID}_fixed.gtf"), val(genome_id), val(individual_bin_count), val(total_bin_count), emit: merged_fixed_gtf
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         cat ${input_gtfs} > ${params.runID}.gtf

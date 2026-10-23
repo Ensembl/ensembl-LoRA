@@ -8,7 +8,6 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SAMTOOLS_CONVERT     } from "../../../modules/local/samtools_convert/main.nf"
 include { SAMTOOLS_SORT        } from '../../../modules/local/samtools_sort/main.nf'
 include { SAMTOOLS_MERGE       } from '../../../modules/local/samtools_merge/main.nf'
 include { PICARD_SPLIT         } from '../../../modules/local/picard_split/main.nf'
@@ -24,18 +23,27 @@ include { CHROMOSOME_SPLIT } from '../../../modules/local/chromosome_split/main.
 
 workflow SAMTOOLS {
     take:
-    sam_files
+    mapped_bam_files
     bam_files
 
     main:
-    // Convert sam to bam
-    SAMTOOLS_CONVERT(sam_files)
+    // Minimap2-derived BAMs are already sorted and indexed. User-provided BAMs still need normalisation.
+    SAMTOOLS_SORT(bam_files)
 
-    // Sort bam files
-    SAMTOOLS_SORT(SAMTOOLS_CONVERT.out.converted_bam.mix(bam_files))
-    
+    sorted_mapped_bam = mapped_bam_files
+        .map { bam, bai, reference, genome_id, raw_file_count ->
+            tuple(genome_id, bam, bai, reference, raw_file_count)
+        }
+
+    sorted_bam_with_index = sorted_mapped_bam.mix(SAMTOOLS_SORT.out.sorted_bam_with_index)
+
+    sorted_bam_for_merge = sorted_bam_with_index
+        .map { genome_id, bam, _bai, reference, raw_file_count ->
+            tuple(genome_id, bam, reference, raw_file_count)
+        }
+
     // Merge all bam files together
-    SAMTOOLS_MERGE(SAMTOOLS_SORT.out.sorted_bam.map { genome_id, bam, reference, raw_file_count -> tuple(groupKey(genome_id, raw_file_count.toInteger()), bam, reference)}.groupTuple().map { genome_id, bams, fasta -> [bams, fasta[0], genome_id] })
+    SAMTOOLS_MERGE(sorted_bam_for_merge.map { genome_id, bam, reference, raw_file_count -> tuple(groupKey(genome_id, raw_file_count.toInteger()), bam, reference)}.groupTuple().map { genome_id, bams, fasta -> [bams, fasta[0], genome_id] })
 
     // Creating chromosome sample sheet
     CHROMOSOME_SAMPLE_SHEET(SAMTOOLS_MERGE.out.merged_bam)
@@ -52,6 +60,10 @@ workflow SAMTOOLS {
     emit:
     prepared_bam = SPLIT_PICARD_CHANNEL.out.picard_sample_sheet.splitCsv()
     chromosome_bam = CHROMOSOME_SPLIT.out.chromosome_bam
+    sorted_bam = sorted_bam_for_merge
+    sorted_bam_bai = sorted_bam_with_index.map { genome_id, _bam, bai, reference, raw_file_count -> tuple(genome_id, bai, reference, raw_file_count) }
+    sorted_bam_with_index = sorted_bam_with_index
+    merged_bam = SAMTOOLS_MERGE.out.merged_bam
 }
 
 /*

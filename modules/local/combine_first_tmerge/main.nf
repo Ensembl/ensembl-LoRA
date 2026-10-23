@@ -5,6 +5,9 @@ process COMBINE_FIRST_TMERGE {
     tuple val(genome_id), path(gtfs), path(contains), val(chromosome_count), val(chromosome_id)
     output:
     tuple val(genome_id), path("${params.runID}_${chromosome_id}_initial_transcripts.gtf"), path("${params.runID}_${chromosome_id}_initial_contains.tsv"), val(chromosome_count), val(chromosome_id), emit: combined_bins
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
     """
     source ~/venv/bin/activate

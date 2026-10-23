@@ -1,0 +1,4 @@
+reads,format,seq_source,map_key,species,tissue,cell_line,sample_id
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample1_rep1a.fastq.gz,fastq,nanopore,hg38,human,breast,NA,NA
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample1_rep1b.fastq.gz,fastq,nanopore,hg38,human,breast,NA,NA
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample2.fasta.gz,fasta,pacbio,hg38,human,lung,NA,sample2

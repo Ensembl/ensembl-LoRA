@@ -1,0 +1,4 @@
+reads,format,seq_source,map_key,species
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample1.fastq.gz,fastq,nanopore,hg38,human
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample2.fasta.gz,fasta,pacbio,hg38,human
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample3.bam,bam,nanopore,hg38,human

@@ -5,6 +5,9 @@ process PICARD_SPLIT {
         tuple path(bam), path(bam_bai), path(reference), val(genome_id), val(chromosome_id), val(chromosome_count), val(bin_count)
     output:
         tuple path("*.picard.bam"), path(reference), val(genome_id), val(chromosome_id), val(chromosome_count), val(bin_count), emit: picard_split
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         if [ ${bin_count} -gt 1 ]; then

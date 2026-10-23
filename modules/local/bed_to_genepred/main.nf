@@ -6,6 +6,9 @@ process BED_TO_GENEPRED {
         tuple  path(bed), val(genome_id), val(chromosome_id), val(chromosome_count), val(bin_count)
     output:
         tuple path("*.txt"), val(genome_id), val(chromosome_id), val(chromosome_count), val(bin_count), emit: converted_genepred
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         bedToGenePred ${bed} ${bed.simpleName}.txt

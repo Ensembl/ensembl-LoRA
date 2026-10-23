@@ -1,0 +1,302 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/lora/nextflow_schema.json",
+    "title": "LoRA pipeline parameters",
+    "description": "Long-read RNA-seq Analysis pipeline.",
+    "type": "object",
+    "definitions": {
+        "boolean_cli": {
+            "anyOf": [
+                {
+                    "type": "boolean"
+                },
+                {
+                    "type": "string",
+                    "enum": [
+                        "true",
+                        "false",
+                        "TRUE",
+                        "FALSE",
+                        "True",
+                        "False"
+                    ]
+                }
+            ]
+        },
+        "input_output_options": {
+            "title": "Input/output options",
+            "type": "object",
+            "description": "Define sample/reference sheets and output locations.",
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "format": "file-path",
+                    "default": "",
+                    "description": "Alias for sample_sheet."
+                },
+                "sample_sheet": {
+                    "type": "string",
+                    "format": "file-path",
+                    "default": "",
+                    "description": "LoRA sample sheet. Headered sheets are recommended; required columns are reads,format,seq_source,map_key,species. Optional columns are genome_id,tissue,cell_line,sample_id,read_id_map. sample_id controls dashboard sample grouping; if absent, LoRA infers split replicate groups such as rep1a/rep1aaz -> rep1. Supplied read_id_map files may be .tsv or .tsv.gz."
+                },
+                "reference_sheet": {
+                    "type": "string",
+                    "format": "file-path",
+                    "default": "",
+                    "minLength": 1,
+                    "description": "LoRA reference sheet. Headered sheets are recommended; required columns are reference_file,genome_id,map_key,species. Optional reference_gtf enables SQANTI3; optional polya_peak and cage_peak BED files add SQANTI3 transcript-end evidence."
+                },
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "default": "",
+                    "minLength": 1,
+                    "description": "Directory where LoRA outputs are published."
+                },
+                "publish_dir_mode": {
+                    "type": "string",
+                    "default": "copy",
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
+                    "description": "Method used by publishDir to publish files."
+                }
+            },
+            "required": [
+                "reference_sheet",
+                "outdir"
+            ]
+        },
+        "lora_options": {
+            "title": "LoRA options",
+            "type": "object",
+            "properties": {
+                "runID": {
+                    "type": "string",
+                    "default": "",
+                    "minLength": 1,
+                    "description": "Unique identifier used in LoRA output filenames."
+                },
+                "minFL": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "string",
+                            "pattern": "^[0-9]+$"
+                        }
+                    ],
+                    "default": 1,
+                    "description": "Minimum number of full-length reads supporting a transcript."
+                },
+                "genomeSize": {
+                    "type": "string",
+                    "default": "normal",
+                    "enum": [
+                        "normal",
+                        "large"
+                    ],
+                    "description": "Genome-size mode for minimap2. Use large to enable minimap2 --split-prefix=tmp."
+                },
+                "species": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Species label used by existing LoRA configurations."
+                },
+                "combine_read_id_maps": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": false,
+                    "description": "Combine per-input compact read ID maps into one per-genome map. Disabled by default because large runs can still produce very large files."
+                },
+                "read_prep_compression_level": {
+                    "anyOf": [
+                        {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9
+                        },
+                        {
+                            "type": "string",
+                            "pattern": "^[1-9]$"
+                        }
+                    ],
+                    "default": 1,
+                    "description": "gzip/pigz compression level for renamed read files and read ID maps. Lower values are faster."
+                },
+                "resume_from": {
+                    "type": "string",
+                    "default": "none",
+                    "enum": [
+                        "none",
+                        "auto",
+                        "read_prep",
+                        "mapped_bam",
+                        "bam_to_gtf",
+                        "merged_models",
+                        "full_length",
+                        "sqanti3",
+                        "dashboard"
+                    ],
+                    "description": "Resume LoRA from trusted published outputs instead of upstream workflow tasks. bam_to_gtf is audit-only and fails with guidance if requested."
+                },
+                "resume_scope": {
+                    "type": "string",
+                    "default": "common",
+                    "enum": [
+                        "common",
+                        "per_genome"
+                    ],
+                    "description": "Checkpoint resume scope. common uses one checkpoint complete for all genomes; per_genome allows each genome to resume from its own requested or automatic checkpoint."
+                }
+            },
+            "required": [
+                "runID"
+            ]
+        },
+        "runtime_options": {
+            "title": "Runtime options",
+            "type": "object",
+            "properties": {
+                "validate_params": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": true,
+                    "description": "Validate parameters using nf-schema."
+                },
+                "help": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": false,
+                    "description": "Show concise nf-schema help."
+                },
+                "help_full": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": false,
+                    "description": "Show full nf-schema help."
+                },
+                "show_hidden": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": false,
+                    "description": "Show hidden parameters in help output."
+                },
+                "monochrome_logs": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": false,
+                    "description": "Disable coloured log output."
+                },
+                "version": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": false,
+                    "description": "Show LoRA version and exit."
+                },
+                "config_profile_name": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "Name of the active config profile."
+                },
+                "config_profile_description": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "Description of the active config profile."
+                },
+                "config_profile_contact": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "Contact for the active config profile."
+                },
+                "config_profile_url": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "URL for the active config profile."
+                },
+                "trace_report_suffix": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "Timestamp suffix used for pipeline execution report filenames."
+                }
+            }
+        },
+        "sqanti3_options": {
+            "title": "SQANTI3 options",
+            "type": "object",
+            "properties": {
+                "run_sqanti3": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": true,
+                    "description": "Run SQANTI3 when a reference GTF is supplied."
+                },
+                "sqanti3_cpus": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "string",
+                            "pattern": "^[0-9]+$"
+                        }
+                    ],
+                    "default": 4,
+                    "description": "CPUs for SQANTI3."
+                },
+                "sqanti3_report": {
+                    "type": "string",
+                    "default": "both",
+                    "enum": [
+                        "pdf",
+                        "html",
+                        "both"
+                    ],
+                    "description": "SQANTI3 report format."
+                },
+                "sqanti3_include_orf": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": true,
+                    "description": "Enable SQANTI3 ORF prediction."
+                },
+                "sqanti3_tusco": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Optional SQANTI3 TUSCO species, for example human."
+                },
+                "sqanti3_by_chromosome": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": false,
+                    "description": "Run SQANTI3 per chromosome using chromosome-filtered reference GTF/BED files. Full-stage SQANTI3 reports are skipped in chromosome mode with --report skip."
+                }
+            }
+        },
+        "dashboard_options": {
+            "title": "Dashboard options",
+            "type": "object",
+            "properties": {
+                "dashboard": {
+                    "$ref": "#/definitions/boolean_cli",
+                    "default": true,
+                    "description": "Build the static LoRA dashboard."
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/lora_options"
+        },
+        {
+            "$ref": "#/definitions/runtime_options"
+        },
+        {
+            "$ref": "#/definitions/sqanti3_options"
+        },
+        {
+            "$ref": "#/definitions/dashboard_options"
+        }
+    ]
+}

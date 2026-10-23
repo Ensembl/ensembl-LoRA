@@ -6,6 +6,9 @@ process BAM_TO_BED {
         tuple path(bam), path(reference_genome), val(genome_id), val(chromosome_id), val(chromosome_count), val(bin_count)
     output:
         tuple path("*.bed"), path(reference_genome), val(genome_id), val(chromosome_id), val(chromosome_count), val(bin_count), emit: converted_bed
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         bedtools bamtobed -bed12 -i ${bam} > ${bam.simpleName}.bed

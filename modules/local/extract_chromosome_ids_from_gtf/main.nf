@@ -5,6 +5,9 @@ process EXTRACT_CHROMOSOME_IDS_FROM_GTF {
     tuple val(genome_id), path(tmerged_gtf), path(contains_file)
     output:
     path('tmerge_sample_sheet.csv'), emit: tmerge_sample_sheet
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
     """
     source ~/venv/bin/activate

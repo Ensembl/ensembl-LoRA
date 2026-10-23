@@ -5,6 +5,9 @@ process INTRON_CHAIN_EXTRACTOR_READS {
         tuple path(bed), val(genome_id), val(chromosome_id), val(chromosome_count)
     output:
         tuple val(chromosome_id), val(genome_id), val(chromosome_count), path("${params.runID}_${chromosome_id}_reads_intron_chains.tsv"), path("${params.runID}_${chromosome_id}_reads_single_exons.tsv"), emit: intron_chains_reads
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         source ~/venv/bin/activate

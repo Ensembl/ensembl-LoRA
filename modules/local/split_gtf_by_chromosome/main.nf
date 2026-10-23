@@ -5,6 +5,9 @@ process SPLIT_GTF_BY_CHROMOSOME {
         tuple val(chromosome), val(genome_id), path(tmerge_gtf), path(contains_file), val(chromosome_count)
     output:
         tuple val(chromosome), val(genome_id), path("${tmerge_gtf.simpleName}_${chromosome}.gtf"), path("${contains_file.simpleName}_${chromosome}.tsv"), val(chromosome_count), emit: chrom_gtf
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         chromosome_id=${chromosome}

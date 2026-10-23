@@ -7,6 +7,9 @@ process CHROMOSOME_SAMPLE_SHEET {
         tuple path(bam), path(bai), path(reference_genome), val(genome_id)
     output:
         path("${bam.simpleName}_sample_sheet.csv"), emit: chromosome_sample_sheet
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         source ~/venv/bin/activate

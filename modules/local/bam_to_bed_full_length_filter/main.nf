@@ -6,6 +6,9 @@ process BAM_TO_BED_FULL_LENGTH_FILTER {
         tuple path(bam), path(bai), val(genome_id), val(chromosome_id), val(chromosome_count)
     output:
         tuple path("*.bed"), val(genome_id), val(chromosome_id), val(chromosome_count), emit: converted_bed
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         bedtools bamtobed -bed12 -i ${bam} > ${bam.simpleName}.bed

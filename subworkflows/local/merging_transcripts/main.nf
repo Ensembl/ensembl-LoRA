@@ -60,6 +60,8 @@ workflow MERGING_TRANSCRIPTS {
 
     emit:
     transcript_models_per_chromosome = BUILD_CONTAINS_FILES.out.combined_contains
+    prefiltered_models = COMBINE_TRANSCRIPT_MODELS.out.combined_transcript_models
+    prefiltered_contains = COMBINE_TRANSCRIPT_MODELS.out.combined_contains_files
 }
 
 /*

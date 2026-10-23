@@ -1,11 +1,13 @@
 process BUILD_CONTAINS_FILES {
     label "process_very_low"
     label "error_retry"
-    publishDir "${params.outDir}/${genome_id}/all_models/chromosomes/", mode: 'copy'
     input:
         tuple val(genome_id), path(second_tmerge_gtf), path(initial_merged_contains), path(final_merged_contains), val(chromosome_count), val(chromosome_id)
     output:
         tuple val(genome_id), path("${params.runID}_${chromosome_id}.combined.gtf"), path("${params.runID}_${chromosome_id}.combined.contains.tsv"), val(chromosome_count), val(chromosome_id), emit:combined_contains
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         if [ -s ${initial_merged_contains} ]; then

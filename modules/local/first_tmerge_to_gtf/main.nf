@@ -5,6 +5,9 @@ process FIRST_TMERGE_TO_GTF {
         tuple val(chromosome_id), path(tmerge_gtf_ch), val(genome_id), val(chromosome_count), val(bin_count)
     output:
         tuple val(chromosome_id), path("*.tama.gtf"), path("*.contains.tsv"), val(genome_id), val(chromosome_count), val(bin_count), emit: first_tmerge_gtf
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         if [ -s ${tmerge_gtf_ch} ]; then

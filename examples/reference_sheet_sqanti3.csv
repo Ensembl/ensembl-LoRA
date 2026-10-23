@@ -1,0 +1,2 @@
+reference_file,genome_id,map_key,species,reference_gtf,polya_peak,cage_peak
+/nfs/production/flicek/ensembl/havana/rmerritt/reference_genomes/hg38/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz,hg38,hg38,human,/nfs/production/flicek/ensembl/havana/rmerritt/sqanti3_testing/data/gencode.v50.annotation.gtf.gz,/path/to/polyA_peaks.bed.gz,/path/to/CAGE_peaks.bed.gz

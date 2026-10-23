@@ -5,6 +5,9 @@ process COMBINE_INTRON_CHAINS_READS {
         tuple val(genome_id), path(intron_chains), path(single_exons)
     output:
         tuple val(genome_id), path("${genome_id}.reads_intron_chains.tsv"), path("${genome_id}.reads_single_exons.tsv"), val(2), emit: merged_intron_chains_reads
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         cat ${intron_chains} > ${genome_id}.reads_intron_chains.tsv

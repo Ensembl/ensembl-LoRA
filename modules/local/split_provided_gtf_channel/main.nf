@@ -5,6 +5,9 @@ process SPLIT_PROVIDED_GTF_CHANNEL {
         tuple path(binned_gtfs), val(genome_id), val(individual_bin_count), val(total_bin_count)
     output:
         path("prepared_gtf_sample_sheet.csv"), emit: prepared_gtf_sample_sheet
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         source ~/venv/bin/activate

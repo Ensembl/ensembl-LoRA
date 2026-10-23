@@ -5,6 +5,9 @@ process SECOND_TMERGE_TO_GTF {
         tuple val(genome_id), path(retmerged_gtf), path(initial_merged_contains), val(chromosome_count), val(chromosome_id)
     output:
         tuple val(genome_id), path("*.final.tama.gtf"), path(initial_merged_contains), path("*.final.contains.tsv"), val(chromosome_count), val(chromosome_id), emit: retmerge_to_gtf_output
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         if [ -s ${retmerged_gtf} ]; then

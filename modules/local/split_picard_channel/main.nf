@@ -5,6 +5,9 @@ process SPLIT_PICARD_CHANNEL {
         tuple path(bam), path(reference), val(genome_id), val(chromosome_id), val(chromosome_count), val(bin_count)
     output:
         path("picard_sample_sheet.csv"), emit: picard_sample_sheet
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         source ~/venv/bin/activate

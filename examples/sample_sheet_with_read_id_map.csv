@@ -1,0 +1,4 @@
+reads,format,seq_source,map_key,species,tissue,cell_line,sample_id,read_id_map
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample1_rep1a.fastq.gz,fastq,nanopore,hg38,human,breast,NA,sample1_rep1,/nfs/production/flicek/ensembl/havana/rmerritt/previous_lora/hg38/reads/read_id_maps/sample1_rep1a.fastq.read_id_map.tsv.gz
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample1_rep1b.fastq.gz,fastq,nanopore,hg38,human,breast,NA,sample1_rep1,/nfs/production/flicek/ensembl/havana/rmerritt/previous_lora/hg38/reads/read_id_maps/sample1_rep1b.fastq.read_id_map.tsv.gz
+/nfs/production/flicek/ensembl/havana/rmerritt/example_reads/sample2.fasta.gz,fasta,pacbio,hg38,human,lung,NA,sample2,/nfs/production/flicek/ensembl/havana/rmerritt/previous_lora/hg38/reads/read_id_maps/sample2.fasta.read_id_map.tsv.gz

@@ -5,6 +5,9 @@ process FIX_FIRST_TMERGE {
         tuple val(chromosome_id), path(input_gtf), val(genome_id), val(chromosome_count), val(bin_count)
     output:
         tuple val(chromosome_id), path("*.tmerge.gtf"), val(genome_id), val(chromosome_count), val(bin_count), emit: first_tmerge_fixed
+    when:
+        task.ext.when == null || task.ext.when
+
     script:
         """
         awk 'BEGIN{OFS=FS="\\t"; IGNORECASE=1} {gsub(/TM_/, "chr"\$1"_", \$NF); gsub(/chrchr/, "chr", \$NF); print}' ${input_gtf} > ${input_gtf.simpleName}.tmerge.gtf

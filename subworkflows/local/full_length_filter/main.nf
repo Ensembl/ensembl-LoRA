@@ -58,13 +58,17 @@ workflow FULL_LENGTH_FILTER {
     FILTER_BAM_FOR_FULL_LENGTH(merged_reads.map { bam, _bai, genome_id, chromosome_id, chromosome_count -> tuple(chromosome_id, genome_id, chromosome_count, bam) }.join(FULL_LENGTH_CONTAINS.out.full_length_contains.map  { chromosome_id, genome_id, full_length_contains, _full_length_contains_stats, chromosome_count -> tuple(chromosome_id, genome_id, chromosome_count, full_length_contains) }, by : [0,1,2]))
     
     // Combine filtered GTF
-    COMBINE_FILTERED_MODELS(FILTER_GTF_FOR_FULL_LENGTH.out.full_length_filtered_gtf.map { genome_id, chromosome_count, gtf, contains -> tuple(groupKey(genome_id, chromosome_count.toInteger()), gtf, contains)}.groupTuple())
+    COMBINE_FILTERED_MODELS(FILTER_GTF_FOR_FULL_LENGTH.out.full_length_filtered_gtf.map { genome_id, chromosome_count, _chromosome_id, gtf, contains -> tuple(groupKey(genome_id, chromosome_count.toInteger()), gtf, contains)}.groupTuple())
     
     // Combine full length reads BAM
     COMBINE_FULL_LENGTH_READS(FILTER_BAM_FOR_FULL_LENGTH.out.full_length_filtered_bam.map { genome_id, chromosome_count, bam, contains -> tuple(groupKey(genome_id, chromosome_count.toInteger()), bam, contains)}.groupTuple())
 
     emit:
-    FULL_LENGTH_CONTAINS.out.full_length_contains
+    full_length_contains_per_chromosome = FULL_LENGTH_CONTAINS.out.full_length_contains
+    filtered_models_per_chromosome = FILTER_GTF_FOR_FULL_LENGTH.out.full_length_filtered_gtf
+    filtered_models = COMBINE_FILTERED_MODELS.out.filtered_gtf
+    full_length_stats = COMBINE_FULL_LENGTH_STATS.out.full_length_stats
+    full_length_reads = COMBINE_FULL_LENGTH_READS.out.merged_full_length_bam
 }
 
 /*

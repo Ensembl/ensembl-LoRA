@@ -8,11 +8,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { AVERAGE_FASTQ_READ_LENGTH } from "../../../modules/local/average_fastq_read_length/main.nf"
-include { AVERAGE_FASTA_READ_LENGTH } from "../../../modules/local/average_fasta_read_length/main.nf"
 include { EDIT_FASTQ_IDS            } from "../../../modules/local/edit_fastq_read_ids/main.nf"
 include { EDIT_FASTA_IDS            } from '../../../modules/local/edit_fasta_read_ids/main.nf'
-include { FASTQ_TO_FASTA            } from '../../../modules/local/fastq_to_fasta/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,19 +23,14 @@ workflow PREPARE_FAST_FILES {
     fasta_files
 
     main:
-    // Get the average read length
-    AVERAGE_FASTQ_READ_LENGTH(fastq_files)
-    AVERAGE_FASTA_READ_LENGTH(fasta_files)
-
-    // Edit read ids
-    EDIT_FASTQ_IDS(AVERAGE_FASTQ_READ_LENGTH.out.passed)
-    EDIT_FASTA_IDS(AVERAGE_FASTA_READ_LENGTH.out.passed)
-
-    // Convert FASTQ to FASTA
-    FASTQ_TO_FASTA(EDIT_FASTQ_IDS.out.edited_fastq)
+    // Validate read lengths while standardising read ids
+    EDIT_FASTQ_IDS(fastq_files)
+    EDIT_FASTA_IDS(fasta_files)
 
     emit:
-    fasta_files = FASTQ_TO_FASTA.out.converted_fasta.mix(EDIT_FASTA_IDS.out.edited_fasta)
+    fasta_files = EDIT_FASTQ_IDS.out.edited_fasta.mix(EDIT_FASTA_IDS.out.edited_fasta)
+    read_id_maps = EDIT_FASTQ_IDS.out.read_id_map.mix(EDIT_FASTA_IDS.out.read_id_map)
+    read_summaries = EDIT_FASTQ_IDS.out.read_summary.mix(EDIT_FASTA_IDS.out.read_summary)
 }
 
 /*
